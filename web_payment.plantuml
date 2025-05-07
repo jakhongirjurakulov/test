@@ -1,0 +1,47 @@
+@startuml Web Market Payment
+    
+    participant User as u
+    participant SmartBazar as m
+    participant SmartBank as b
+
+    u o-> m ++: Login
+    m --> u --: Auth Form
+    u -> m ++: Tel number
+    m -> m : //v1/auth/send-verification//
+    m --> u --: Sms
+    u -> m ++: Code
+    m -> m : //v1/auth/verify-code//
+    m --> u --: Response: 200
+
+    alt Type of payment? Card(cash)
+        u o-> m ++: 
+        m -> b --++: Redirection
+        b -> u --++: Payment form
+        u -> b --++: Code
+        b -> b : Withdraw money
+        b -> m --++: Response: 200
+        m -> u : Succeed screen
+        m -> m --: **Post:** //v1/orders//
+    else Installment
+        ' u o-> m ++:
+        alt Is User? \n Yes
+            u o-> m ++: 
+            m o-> u : **Get:** ///blocks/main//
+            ' b -> m --: Widget
+        else No
+            m o-> u ++: Fast Loan form
+            u -> m --: Passport info
+        end
+        alt Limit? Yes
+            m o-> m: Sum vs limit
+            alt Enough? Yes
+                m o-> m : **Post:** //v1/orders//
+            else No
+                m o-> m: Stop screen
+            end
+        else No
+            m o-> m--: Stop screen
+        end
+    end
+
+@enduml

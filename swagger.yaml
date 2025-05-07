@@ -1,0 +1,856 @@
+openapi: 3.0.3
+info:
+  title: Client Profile - OpenAPI 3.0
+  description: |-
+    Client Profile Service
+  contact:
+    email: jahongir.hamidov@smartbank.uz
+  version: 1.0.0
+servers:
+  - url: https://client-profile-service/
+tags:
+  - name: client
+    description: Client path 
+    externalDocs:
+      url: https://client-profile-service/client
+paths:
+  /client:
+    post:
+      tags:
+        - client
+      summary: Create a new client profile object
+      description: Create a new client profile object
+      operationId: createClient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClientPostBody'
+        required: true
+      responses:
+        '2XX':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientPostSuccess'  
+              examples:
+                200:
+                  value:
+                    code: "Successful" 
+                    message: "Операция прошла успешно"    
+                201: 
+                  value:
+                    code: "Created"
+                    message: "Объект успешно создан"   
+        '4XX': 
+          description: Client errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+              examples:
+                400:
+                  value:
+                    error:
+                      code: "Bad Request"
+                      message: "Извините, возникла проблема. Возможно, паспортные данные были введены неверно. Повторите попытку позже или позвоните в колл-центр."
+                401:
+                  value:
+                    error:
+                      code: "Unauthorized"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                403:
+                  value:
+                    error:
+                      code: "Forbidden"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                404:
+                  value:
+                    error:
+                      code: "Not Found"
+                      message: "Нам не удалось найти информацию об этом человеке, или этот человек не существует в качестве клиента."
+                405:
+                  value:
+                    error:
+                      code: "Method Not Allowed"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                406:
+                  value:
+                    error:
+                      code: "Not Acceptable"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                429:
+                  value:
+                    error:
+                      code: "Too Many Requests"
+                      message: "Извините, возникла проблема. Повторите попытку позже."  
+
+        '5XX':
+          description: Service Faults
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+              examples:
+                502:
+                  value:
+                    error:
+                      code: "BAD_GATEWAY"
+                      message: "Извините, возникла проблема. Повторите попытку позже или позвоните в контакт-центр."
+                504:
+                  value:
+                    error:
+                      code: "GATEWAY_TIMEOUT"
+                      message: "Извините, возникла проблема. Повторите попытку позже или позвоните в контакт-центр."
+
+
+
+
+  /client/{clientId}:
+    get:
+      tags:
+        - client
+      summary: Get client by ID
+      description: Returns a single client data
+      operationId: getClientById
+      parameters:
+        - name: clientId
+          in: path
+          description: ID of client to return
+          required: true
+          schema:
+            type: string
+            format: string
+      responses:
+        '200':
+          description: successful operation
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClientGetSuccess'          
+        '4XX': 
+          description: Client errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+              examples:
+                401:
+                  value:
+                    error:
+                      code: "Unauthorized"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                403:
+                  value:
+                    error:
+                      code: "Forbidden"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                404:
+                  value:
+                    error:
+                      code: "Not Found"
+                      message: "Нам не удалось найти информацию об этом человеке, или этот человек не существует в качестве клиента."
+                405:
+                  value:
+                    error:
+                      code: "Method Not Allowed"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                406:
+                  value:
+                    error:
+                      code: "Not Acceptable"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                429:
+                  value:
+                    error:
+                      code: "Too Many Requests"
+                      message: "Извините, возникла проблема. Повторите попытку позже."  
+
+        '5XX':
+          description: Service Faults
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+              examples:
+                502:
+                  value:
+                    error:
+                      code: "BAD_GATEWAY"
+                      message: "Извините, возникла проблема. Повторите попытку позже или позвоните в контакт-центр."
+                504:
+                  value:
+                    error:
+                      code: "GATEWAY_TIMEOUT"
+                      message: "Извините, возникла проблема. Повторите попытку позже или позвоните в контакт-центр."
+
+    patch: 
+      tags:
+        - client
+      summary: Update client by ID
+      description: Updates a single client data
+      operationId: updateClientById    
+      parameters:
+        - name: clientId
+          in: path
+          description: ID of client to return
+          required: true
+          schema:
+            type: string
+            format: string        
+      requestBody:
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: '#/components/schemas/ClientAddressSchema'
+                - $ref: '#/components/schemas/ClientPassportSchema'
+                - $ref: '#/components/schemas/ClientBankSchema'
+                - $ref: '#/components/schemas/ClientDetailsSchema'
+                - $ref: '#/components/schemas/ClientPhoneSchema'
+                - $ref: '#/components/schemas/ClientComplianceSchema'
+                - $ref: '#/components/schemas/ClientAgreementsSchema'
+            examples:
+              ClientAddressSchema:
+                summary: ClientAddressSchema
+                value:
+                  address:
+                    permanent_address:
+                      country_id: 182
+                      region_id: 15
+                      district_id: 1507
+                      street_name: "БОЗОРБОШИ МФЙ, Х.ОЛИМЖОН КЎЧАСИ,  uy:24"
+                      address: "БОЗОРБОШИ МФЙ, Х.ОЛИМЖОН КЎЧАСИ,  uy:24"
+                      house_number: "2A"
+                      block_number: 3
+                      flat_number: 19
+                      registered_at: "2024-02-21T17:34:19.371674766"
+                    temporary_address:
+                      country_id: 182
+                      region_id: 15
+                      district_id: 1507
+                      street_name: "БОЗОРБОШИ МФЙ, Х.ОЛИМЖОН КЎЧАСИ,  uy:24"
+                      address: "БОЗОРБОШИ МФЙ, Х.ОЛИМЖОН КЎЧАСИ,  uy:24"
+                      house_number: "2A"
+                      block_number: 3
+                      flat_number: 19
+                      registered_at: "2023-02-21T17:34:19.371674766"
+                      registered_end: "2023-09-21T17:34:19.371674766"
+
+                  
+              ClientPassportSchema:
+                summary: ClientPassportSchema
+                value:
+                  passport_number: 5555555
+                  passport_series: "AB"
+                  birth_date: '01-01-1999'
+                  sex: "male"
+                  date_issue: '01-01-2015'
+                  date_expiry: '01-01-2025'
+                  given_place_id: 14215
+                  given_place_name: "НАМАНГАН ВИЛОЯТИ ЧОРТОҚ ТУМАНИ ИИБ"
+                  birth_country_id: 182
+                  birth_country_name: "ЎЗБЕКИСТОН"
+                  birth_place: "CHORTOQ TUMANI"
+                  nationality_id: 44
+                  nationality_name: "ЎЗБЕК"
+                  citizenship_id: 182
+                  citizenship_name: "ЎЗБЕКИСТОН"
+
+              ClientBankSchema:
+                summary: ClientBankSchema
+                value:
+                  customer_no: "60000111" 
+                  customer_status: "REGULAR"
+
+              ClientDetailsSchema:
+                summary: ClientDetailsSchema
+                value:
+                  first_name: "Abduvali"
+                  middle_name: "Abduvaliyevich"
+                  last_name: "Abduvaliyev"
+                  pinfl: "30511902221272"
+                  subject_state: "1"
+
+              ClientPhoneSchema:
+                summary: ClientPhoneSchema
+                value:
+                  phone_num: "+998901234567"
+                  phone_provider: "Beeline"
+
+              ClientComplianceSchema:
+                summary: ClientComplianceSchema
+                value:
+                  is_blocked: false
+                  is_paused: false
+                  is_deleted: false
+
+              ClientAgreementsSchema:
+                summary: ClientAgreementsSchema
+                value:
+                  doc_type: "04olab"
+                  doc_name: "«SMART BANK» mobil ilovasidan foydalanish bo’yicha OMMAVIY OFERTA SHARTNOMASI"
+                   
+                  
+
+              
+        required: true
+      responses:
+        '200':
+          description: object is successfully updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClientUpdateSuccess"
+              examples:
+                200:
+                  value:
+                    code: "200"
+                    message: "Операция прошла успешно"
+        
+        '4XX': 
+          description: Client errors
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+              examples:
+                400:
+                  value:
+                    error:
+                      code: "Bad Request"
+                      message: "Извините, возникла проблема. Возможно, паспортные данные были введены неверно. Повторите попытку позже или позвоните в колл-центр."
+                401:
+                  value:
+                    error:
+                      code: "Unauthorized"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                403:
+                  value:
+                    error:
+                      code: "Forbidden"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                404:
+                  value:
+                    error:
+                      code: "Not Found"
+                      message: "Нам не удалось найти информацию об этом человеке, или этот человек не существует в качестве клиента."
+                405:
+                  value:
+                    error:
+                      code: "Method Not Allowed"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                406:
+                  value:
+                    error:
+                      code: "Not Acceptable"
+                      message: "Извините, возникла проблема. Повторите попытку позже."
+                429:
+                  value:
+                    error:
+                      code: "Too Many Requests"
+                      message: "Извините, возникла проблема. Повторите попытку позже."  
+
+        '5XX':
+          description: Service Faults
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorObject"
+              examples:
+                502:
+                  value:
+                    error:
+                      code: "BAD_GATEWAY"
+                      message: "Извините, возникла проблема. Повторите попытку позже или позвоните в контакт-центр."
+                504:
+                  value:
+                    error:
+                      code: "GATEWAY_TIMEOUT"
+                      message: "Извините, возникла проблема. Повторите попытку позже или позвоните в контакт-центр."
+
+
+components:
+  schemas:
+    ClientPostBody:
+      type: object
+      required:
+        - phone_num
+        - pass_series
+        - pass_number
+        - birth_date
+        - first_name
+        - middle_name
+        - last_name
+        - pinfl
+        - sex
+        - date_issue
+        - date_expiry
+        - subject_state
+        - birth_country_id
+        - nationality_id
+        - citizenship_id
+      properties:
+        phone_num:
+          type: string
+          example: '+998901234567'
+        pass_series:
+          type: string
+          example: 'AB'
+        pass_number:
+          type: string
+          example: '5555555'
+        birth_date:
+          type: string
+          format: date
+          description: "birthdate of a potential client"
+          example: "01-01-1999"
+        first_name:
+          type: string
+          example: "Abduvali"
+          description: first name of a potential client
+        middle_name:
+          type: string
+          example: "Abduvaliyevich"
+          description: middle name of a potential client
+        last_name:
+          type: string
+          example: "Abduvaliyev"
+          description: last name of a potential client
+        pinfl:
+          type: number
+          format: number
+          description: personal identification number of citizen
+          example: 30511902221272
+        sex:
+          type: string
+          description: gender of a potential client
+          example: male
+        date_issue:
+          type: string
+          format: date
+          description: person's passport issue date 
+          example: "01-01-2015"
+        date_expiry:
+          type: string
+          format: date
+          description: person's passport expire date
+          example: "01-01-2025"
+        given_place_id:
+          type: number
+          format: number
+          example: 14215
+          description: person's passport given place ID 
+        given_place_name:
+          type: string
+          description: person's passport given place name 
+          example: "НАМАНГАН ВИЛОЯТИ ЧОРТОҚ ТУМАНИ ИИБ"
+        birth_country_id:
+          type: number
+          format: number
+          example: 182
+          description: person's birth country id
+        birth_country_name:
+          type: string
+          example: ЎЗБЕКИСТОН
+          description: person's birth country name
+        birth_place:
+          type: string
+          example: CHORTOQ TUMANI
+          description: person's birth place name
+        nationality_id:
+          type: number
+          example: 44
+          description: person's nationality id
+        nationality_name:
+          type: string
+          example: "ЎЗБЕК"
+          description: person's nationality name
+        citizenship_id:
+          type: number
+          description: person's citienship country id
+          example: 182
+        citizenship_name:
+          type: string
+          example: ЎЗБЕКИСТОН
+          description: person's citienship country name
+        subject_state:
+          type: string
+          example: 1
+          description: state of the subject
+        
+
+    ClientPostSuccess:
+      type: object
+      properties:
+        code:
+          type: string
+          example: "200"
+        message:
+          type: string
+          example: "The operation completed successfully"
+
+      
+    ClientGetSuccess:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 613da001-41f0-45f9-aa1a-e73d40f1a88a
+        version:
+          type: string
+          format: date-time
+          description: version
+          example: "2024-02-13T14:10:10"
+        clientDetails:
+          $ref: '#/components/schemas/ClientDetailsSchema'
+        clientPassport:
+          $ref: '#/components/schemas/ClientPassportSchema'
+        clientPhone:
+          $ref: '#/components/schemas/ClientPhoneSchema'
+        clientAddress:
+          $ref: '#/components/schemas/ClientAddressSchema'
+        clientBank:
+          $ref: "#/components/schemas/ClientBankSchema"
+        clientCompliance:
+          $ref: "#/components/schemas/ClientComplianceSchema"
+        clientAgreements:
+          $ref: "#/components/schemas/ClientAgreementsSchema"
+
+    ClientUpdateSuccess:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+
+  
+    ClientBankSchema:
+      type: object
+      required:
+        - "customerNo"
+        - "customerStatus"
+      properties:
+        customer_no:
+          type: string
+          example: "60000111"
+          description: client's unique identificator in CBS system
+        customer_status:
+          type: string
+          example: "REGULAR"
+          default: "REGULAR"
+          description: Type or status of the client
+        
+
+    ClientDetailsSchema:
+      type: object
+      required:
+        - "first_name"
+        - "middle_name"
+        - "last_name"
+        - "pinfl"
+        - "subject_state"
+      properties:
+        first_name:
+          type: string
+          example: "Abduvali"
+          description: first name of a potential client
+        middle_name:
+          type: string
+          example: "Abduvaliyevich"
+          description: middle name of a potential client
+        last_name:
+          type: string
+          example: "Abduvaliyev"
+          description: last name of a potential client
+        pinfl:
+          type: string
+          description: personal identification number of citizen
+          example: "30511902221272"
+        subject_state:
+          type:  string
+          description: state of subject 
+          example: "1"
+
+
+
+
+    ClientPassportSchema:
+      type: object
+      required:
+        - "passport_number"
+        - "passport_series"
+        - "birth_date"
+        - "sex"
+        - "date_issue"
+        - "date_expiry"
+        - "given_place_id"
+        - "birth_country_id"
+        - "nationality_id"
+        - "nationality_name"
+        - "citizenship_id"
+        - "citizenship_name"
+      properties:
+        passport_number:
+          type: string
+          description: passport number
+          example: "5555555"
+        passport_series:
+          type: string
+          description: passport series of a potential client
+          example: "AB"
+        birth_date:
+          type: string
+          format: date
+          description: birth date of a potential client
+          example: "01-01-1999"
+        sex:
+          type: string
+          description: gender of a potential client
+          example: male
+        date_issue:
+          type: string
+          format: date
+          description: person's passport issue date
+          example: "01-01-2015"
+        date_expiry:
+          type: string
+          format: date
+          description: person's passport expire date
+          example: "01-01-2025"
+        given_place_id:
+          type: number
+          format: number
+          example: 14215
+          description: person's passport given place ID 
+        given_place_name:
+          type: string
+          description: person's passport given place name 
+          example: "НАМАНГАН ВИЛОЯТИ ЧОРТОҚ ТУМАНИ ИИБ"
+        birth_country_id:
+          type: number
+          format: number
+          example: 182
+          description: person's birth country id
+        birth_country_name:
+          type: string
+          example: ЎЗБЕКИСТОН
+          description: person's birth country name
+        birth_place:
+          type: string
+          example: CHORTOQ TUMANI
+          description: person's birth place name
+        nationality_id:
+          type: number
+          example: 44
+          description: person's nationality id
+        nationality_name:
+          type: string
+          example: "ЎЗБЕК"
+          description: person's nationality name
+        citizenship_id:
+          type: number
+          description: person's citienship country id
+          example: 182
+        citizenship_name:
+          type: string
+          example: ЎЗБЕКИСТОН
+          description: person's citienship country name
+        
+    ClientPhoneSchema:
+      type: object
+      required:
+        - "phoneNumber"
+      properties:
+        phone_num:
+          type: string
+          description: client's phone number
+          example: "+998901234567"
+        phone_provider:
+          type: string
+          description: phone number provider
+          example: Beeline
+
+    ClientComplianceSchema:
+      type: object
+      required:
+        - "is_blocked"
+        - "is_paused"
+        - "is_deleted"
+      properties:
+        is_blocked:
+          type: boolean
+          example: false
+          default: false
+          description: "Is the client blocked by bank?"
+        is_paused:
+          type: boolean
+          example: false
+          default: false
+          description: "Does the client paused his/her account?"
+        is_deleted:
+          type: boolean
+          example: false
+          default: false
+          description: "Is the client account deleted by bank?"
+
+    ClientAgreementsSchema:
+      type: object
+      required:
+        - "docType"
+      properties:
+        doc_type:
+          type: string
+          example: "04olab"
+          description: "document type in Smartbank system"
+        doc_name:
+          type: string
+          example: "«SMART BANK» mobil ilovasidan foydalanish bo’yicha OMMAVIY OFERTA SHARTNOMASI"
+          description: "Document name or document description"
+
+    ClientAddressSchema:
+      type: object
+      properties:
+        address:
+          type: object
+          properties:
+            permanent_address:
+              $ref: "#/components/schemas/PerAddressSchema"
+            temporary_address:
+              $ref: "#/components/schemas/TempAddressSchema"
+    
+
+    PerAddressSchema:
+      type: object
+      required:
+        - "countryId"
+        - "regionId"
+        - "districtId"
+        - "streetName"
+        - "address"
+      properties:
+        country_id:
+          type: string
+          description: person's permanent address country id
+          example: 182
+        region_id:
+          type: number
+          format: number
+          description: person's permanent address region id
+          example: 15
+        district_id:
+          type: number
+          format: number
+          description: person's permanent address district id
+          example: 1507
+        street_name:
+          type: string
+          description: person's permanent address street name
+          example: "БОЗОРБОШИ МФЙ, Х.ОЛИМЖОН КЎЧАСИ,  uy:24"
+        address:
+          type: string
+          description: person's permanent address name
+          example: "БОЗОРБОШИ МФЙ, Х.ОЛИМЖОН КЎЧАСИ,  uy:24"
+        house_number:
+          type: string
+          description: person's permanent address house number
+          example: 2A
+        block_number:
+          type: number
+          format: number
+          example: 3
+          description: person's permanent address block number
+        flat_number:
+          type: number
+          format: number
+          example: 19
+          description: person's permanent address flat number
+        registered_at:
+          type: string
+          format: date-time
+          description: person's permanent address registered date
+          example: "2024-02-21T17:34:19.371674766"
+
+    TempAddressSchema:
+      type: object
+      properties:
+        country_id:
+          type: string
+          description: person's temporary address country id
+          example: 182
+        region_id:
+          type: number
+          format: number
+          description: person's temporary address region id
+          example: 15
+        district_id:
+          type: number
+          format: number
+          description: person's temporary address district id
+          example: 1507
+        street_name:
+          type: string
+          description: person's temporary address street name
+          example: "БОЗОРБОШИ МФЙ, Х.ОЛИМЖОН КЎЧАСИ,  uy:24"
+        address:
+          type: string
+          description: person's temporary address name
+          example: "БОЗОРБОШИ МФЙ, Х.ОЛИМЖОН КЎЧАСИ,  uy:24"
+        house_number:
+          type: string
+          description: person's temporary address house number
+          example: 2A
+        block_number:
+          type: number
+          format: number
+          example: 3
+          description: person's temporary address block number
+        flat_number:
+          type: number
+          format: number
+          example: 19
+          description: person's temporary address flat number
+        registered_at:
+          type: string
+          format: date-time
+          description: person's temporary address registered date
+          example: "2023-02-21T17:34:19.371674766"
+        registered_end:
+          type: string
+          format: date-time
+          description: person's temporary address registered end date
+          example: "2023-09-21T17:34:19.371674766"
+
+    ErrorObject:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:              
+              type: string
+              example: "400"
+            message:
+              type: string
+              example: "Error. Please enter all expected data"
+              description: "Error's definition message"
+            target:
+              type: string
+              example: "input"
+            localize: 
+              $ref: "#/components/schemas/Localize"  
+          required: 
+            - code
+            - message  
+
+    Localize:
+      type: object
+      properties:        
+        message:
+          type: string
+          example: "ошибка"
+        extra:
+          type: string
+          example: "ошибка в локали RU"
